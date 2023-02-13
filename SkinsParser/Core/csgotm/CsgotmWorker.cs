@@ -13,22 +13,23 @@ namespace SkinsParser.Core.csgotm
 {
     internal class CsgotmWorker
     {
-        CsgotmSettings settings;
+        private CsgotmSettings csgotmSettings;
         public CsgotmWorker(string name, string quality)
         {
-            settings = new CsgotmSettings(name, quality);
+            csgotmSettings = new CsgotmSettings(name, quality);
         }
-        public void GetItem(string MarketHashName)
+        //example add
+        public string GetItem(string MarketHashName)
         {
             var SbfullUrl = new StringBuilder();
-            SbfullUrl.Append(settings.Url);
-            SbfullUrl.Append(settings.ApiVersion);
-            SbfullUrl.Append($"search-item-by-hash-name?key={settings.SecurityKey}&hash_name={MarketHashName}");
+            SbfullUrl.Append(csgotmSettings.Url);
+            SbfullUrl.Append(csgotmSettings.ApiVersion);
+            SbfullUrl.Append($"search-item-by-hash-name?key={csgotmSettings.SecurityKey}&hash_name={MarketHashName}");
             var fullUrl = SbfullUrl.ToString();
             var client = new HttpClient();
-            var content = client.GetStringAsync(fullUrl);
+            var content = client.GetStringAsync(fullUrl);   
             JObject json = JObject.Parse(content.Result);
-            Console.WriteLine(json);
+            return(json["data"][0].ToString());
         }
     }
 }
