@@ -15,22 +15,41 @@ namespace SkinsParser.Core.csmoney
     internal class CsMoneyWorker
     {
         private CsMoneySettings csMoneySettings;
-        public CsMoneyWorker(string name, string quality)
+        public CsMoneyWorker(string weapon, string quality, string skin)
         {
-            csMoneySettings = new CsMoneySettings(name, quality);
+            ChangeQuality(ref quality);
+            csMoneySettings = new CsMoneySettings(weapon, quality, skin);
         }
-        //example MarketName = M4A4%20Neo-Noir
-        public async Task<double> GetItem(string MarketName)
+        //method to replace quality(Field-Tested as ft for example)
+        void ChangeQuality(ref string quality)
         {
-            var client = new HttpClient();
-            //OLD = https://cs.money/1.0/market/sell-orders?limit=1&name=M4A4%20Neo-Noir&order=asc&quality=bs&sort=price
-            var content = await client.GetStringAsync($"https://cs.money/1.0/market/sell-orders?limit=1&name={MarketName.Substring(0, MarketName.IndexOf('%'))}%{MarketName.Substring(MarketName.IndexOf('%') +1, MarketName.Length - MarketName.IndexOf('%') - 1)}&order=asc&quality=bs&sort=price");
-            var domParser = new HtmlParser();
-            var document = await domParser.ParseDocumentAsync(content);
-            JObject json = JObject.Parse(content);
-            double dollarSum = ((double)json["items"][0]["pricing"]["computed"]);
-            var dollarRate = await DollarRate.GetDollarRate();
-            return dollarRate * dollarSum;
+            var twoSymbols = new string[2];
+            if (quality.Contains(' '))
+            {
+                twoSymbols = quality.Split(' ');
+            }
+            else
+            {
+                twoSymbols = quality.Split('-');
+            }
+            quality = Convert.ToString(Char.ToLower(twoSymbols[0][0])) + Convert.ToString(Char.ToLower(twoSymbols[1][0]));
+        }
+        public async Task<string> GetItem()
+        {
+            using (var client = new HttpClient())
+            {
+                var content = await client.GetStringAsync($"https://cs.money/1.0/market/sell-orders?limit=1&name={csMoneySettings.Name}%20{csMoneySettings.Skin}&order=asc&quality={csMoneySettings.Quality}&sort=price");
+                var domParser = new HtmlParser();
+                var document = await domParser.ParseDocumentAsync(content);
+                JObject json = JObject.Parse(content);
+                double dollarSum = ((double)json["items"][0]["pricing"]["computed"]);
+                var dollarRate = await DollarRate.GetDollarRate();
+                return Math.Round(dollarRate * dollarSum, 2).ToString();
+            }
+        }
+        public string GetURL()
+        {
+            return csMoneySettings.Url;
         }
     }
 }
