@@ -102,11 +102,13 @@
   <ItemGroup>
     <Compile Include="Core\csgotm\CsgotmSettings.cs" />
     <Compile Include="Core\csgotm\CsgotmWorker.cs" />
-    <Compile Include="Core\csmoney\cb\DollarRate.cs" />
+    <Compile Include="Core\cb\DollarRate.cs" />
     <Compile Include="Core\csmoney\CsMoneySettings.cs" />
     <Compile Include="Core\csmoney\CsMoneyWorker.cs" />
     <Compile Include="Core\IItemSettings.cs" />
     <Compile Include="Core\ISiteSettings.cs" />
+    <Compile Include="Core\steam community market\SteamCommunityMarketSettings.cs" />
+    <Compile Include="Core\steam community market\SteamCommunityMarketWorker.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
