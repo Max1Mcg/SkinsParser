@@ -10,5 +10,6 @@ namespace SkinsParser.Core
     {
         string Name { get; set; }
         string Quality { get; set; }
+        string Skin { get; set; }
     }
 }
