@@ -71,6 +71,19 @@ namespace SkinsParser
             dataGridView1.Rows[0].Cells[2].Value = csgotm.GetURL();
             dataGridView1.Rows[1].Cells[2].Value = csMoney.GetURL();
             dataGridView1.Rows[2].Cells[2].Value = steamCommunityMarketWorker.GetURL();
+            //list of async tasks for set text in griedview
+            var tasks = new List<Task<Tuple<string, double>>>(){CsgotmAsync(minPriceUrl), CsMoneyAsync(minPriceUrl), SteamCommunityMarketAsync(minPriceUrl) };
+            while (tasks.Count != 0)
+            {
+                Task<Tuple< string, double>> cur = await Task.WhenAny(tasks);
+                minPriceUrl = cur.Result;
+                tasks.Remove(cur);
+            }
+            textBox1.Text = minPriceUrl.Item1;
+        }
+        public async Task<Tuple<string, double>> CsgotmAsync(Tuple<string, double>min)
+        {
+            var minPriceUrl = min;
             try
             {
                 dataGridView1.Rows[0].Cells[1].Value = (await csgotm.GetItem());
@@ -83,6 +96,11 @@ namespace SkinsParser
                 dataGridView1.Rows[0].Cells[1].Value = "None";
                 errorMessage(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            return minPriceUrl;
+        }
+        public async Task<Tuple<string, double>> CsMoneyAsync(Tuple<string, double> min)
+        {
+            var minPriceUrl = min;
             try
             {
                 dataGridView1.Rows[1].Cells[1].Value = (await csMoney.GetItem());
@@ -95,6 +113,11 @@ namespace SkinsParser
                 dataGridView1.Rows[1].Cells[1].Value = "None";
                 errorMessage(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            return minPriceUrl;
+        }
+        public async Task<Tuple<string, double>> SteamCommunityMarketAsync(Tuple<string, double> min)
+        {
+            var minPriceUrl = min;
             try
             {
                 dataGridView1.Rows[2].Cells[1].Value = (await steamCommunityMarketWorker.GetItem());
@@ -107,7 +130,7 @@ namespace SkinsParser
                 dataGridView1.Rows[2].Cells[1].Value = "None";
                 errorMessage(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            textBox1.Text = minPriceUrl.Item1;
+            return minPriceUrl;
         }
     }
 }
